@@ -1,0 +1,39 @@
+# --- Secret / 環境 ---
+.env
+*.env
+!.env.example
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# 虛擬環境(若有用 venv;conda 環境通常不在專案內,但保險起見)
+.venv/
+venv/
+env/
+
+# --- 資料庫 ---
+*.db
+*.sqlite
+*.sqlite3
+
+# --- 前端 (Day 6 之後) ---
+node_modules/
+dist/
+.vite/
+*.local
+
+# --- 編輯器 / 作業系統 ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

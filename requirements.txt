@@ -1,0 +1,8 @@
+# Day 1 需要的最小依賴。之後各天會逐步增加(spotipy、google-generativeai、
+# sqlalchemy、apscheduler 等),到時再補進來。
+
+fastapi
+uvicorn[standard]
+pydantic-settings
+httpx          # 之後串外部 API 用(TestClient 也需要)
+pytest
