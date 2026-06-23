@@ -24,7 +24,8 @@ class Settings(BaseSettings):
     # Spotify(Day 2 開始用)
     spotify_client_id: str = ""
     spotify_client_secret: str = ""
-    spotify_redirect_uri: str = "http://localhost:8000/callback"
+    # 注意:Spotify 2025 起不接受 http://localhost,本機要用 loopback IP 127.0.0.1
+    spotify_redirect_uri: str = "http://127.0.0.1:8000/callback"
 
     # Gemini(Day 4 開始用)
     gemini_api_key: str = ""

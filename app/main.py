@@ -8,12 +8,13 @@
 from fastapi import FastAPI
 
 from app.core.config import settings
-from app.routers import health
+from app.routers import auth, health
 
 app = FastAPI(title=settings.app_name)
 
-# 掛上各功能的 router(目前只有 health,之後 spotify / playlists / concerts 陸續加入)
+# 掛上各功能的 router(之後 playlists / concerts 陸續加入)
 app.include_router(health.router)
+app.include_router(auth.router)
 
 
 @app.get("/")

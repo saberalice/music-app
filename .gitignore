@@ -26,6 +26,9 @@ env/
 *.sqlite
 *.sqlite3
 
+# --- Spotify token 暫存(含 access/refresh token,等同密碼)---
+.spotify_token.json
+
 # --- 前端 (Day 6 之後) ---
 node_modules/
 dist/
