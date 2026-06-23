@@ -30,6 +30,9 @@ class Settings(BaseSettings):
     # Gemini(Day 4 開始用)
     gemini_api_key: str = ""
 
+    # Last.fm(Day 3:補 Spotify 拿不到的 artist 曲風)
+    lastfm_api_key: str = ""
+
     # 資料庫(Day 3 開始用)
     database_url: str = "sqlite:///./musicapp.db"
 

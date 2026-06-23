@@ -41,6 +41,11 @@ tests/          # pytest 測試
 2024/11 後新建的 app **不能用** Recommendations、Audio Features 端點(回 403)。
 只用:Search、Top Tracks/Artists、Recently Played、已收藏、建立歌單。請勿產生用到被禁端點的程式碼。
 
+實測補充(2026/06):新 app 拿到的 **artist 物件被精簡,沒有 `genres` 和 `popularity`**
+(top/single 端點都只回 id/name/images/...;批次 `/artists?ids=` 直接回 403)。
+因此「曲風分佈」改用 **Last.fm**(`artist.getTopTags`)補曲風,key 放 `LASTFM_API_KEY`。
+別再寫依賴 Spotify artist genres / popularity 的程式。
+
 ## 開發紀律(請協助維持)
 
 1. 動手前先在 `docs/` 補幾行設計。

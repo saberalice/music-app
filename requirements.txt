@@ -4,5 +4,6 @@
 fastapi
 uvicorn[standard]
 pydantic-settings
-httpx          # 之後串外部 API 用(TestClient 也需要)
+httpx          # 串外部 API 用(TestClient 也需要)
+sqlalchemy     # Day 3:ORM,操作 SQLite
 pytest

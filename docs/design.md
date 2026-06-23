@@ -54,6 +54,44 @@ Spotify API → service 抓資料 → repository 存進 SQLite → 統計 servic
 ### 演唱會通知
 排程器定時 → 各 ConcertSource(Adapter)抓資料並轉成統一 Event → repository 去重 → 通知模組寄送。
 
+## 五之一、Day 3 聽歌統計 — 資料表與端點設計
+
+### 要存什麼(SQLite,透過 SQLAlchemy ORM)
+
+- **artist**(歌手):`id`(Spotify id, PK)、`name`、`genres`(JSON 字串)、`popularity`、`rank`(在 Top Artists 的名次,越小越常聽)
+- **track**(歌曲):`id`(PK)、`name`、`artist_name`、`album`、`popularity`、`rank`
+- **play_history**(播放紀錄):`id`(自增 PK)、`track_id`、`track_name`、`artist_name`、`played_at`
+  - `(track_id, played_at)` 設唯一鍵 → 重複抓最近播放時自動去重
+
+### 資料流
+
+1. `POST /sync` → service 用 Day 2 的 token 打 Spotify(Top Artists / Top Tracks / Recently Played)
+   → 純函式 `parse_*` 把回應轉成乾淨 DTO → repository 寫進 SQLite(upsert / 去重)。
+2. `GET /stats/*` → repository 從 SQLite 撈出 → service 用純函式做彙總 → router 回 JSON。
+
+### 端點
+
+| 方法 | 路徑 | 說明 |
+|------|------|------|
+| POST | `/sync` | 從 Spotify 拉資料進 DB(要先登入過) |
+| GET  | `/stats/top-artists` | 最常聽歌手 Top 10(依 rank) |
+| GET  | `/stats/genres` | 曲風分佈(彙總所有歌手的 genres) |
+| GET  | `/stats/heatmap` | (進階)聽歌時段熱力圖,星期 × 小時 |
+
+### 為什麼這樣分
+
+- 抓資料(client)、存取(repository)、彙總(service 純函式)分開 → 彙總邏輯不碰 DB/網路,**單元測試好寫**。
+- 只用仍可用的 Spotify 端點(Top、Recently Played),避開被禁的 Recommendations / Audio Features。
+
+### 踩到的真實限制:曲風改用 Last.fm
+
+實測發現 Spotify 對 2024/11 後新建的 app **拔掉了 artist 的 `genres` 與 `popularity`**
+(top/single 端點都不回,批次 `/artists?ids=` 回 403)。因此:
+- `popularity` 拿不到 → 不再顯示。
+- 曲風改由 **Last.fm `artist.getTopTags`** 補:sync 時逐位歌手查標籤當曲風。
+  這一步讓同一個 `ArtistDTO` 的資料來自兩個來源(Spotify + Last.fm),正好是 Day 8
+  多來源整合 / Adapter 的雛形。沒設 `LASTFM_API_KEY` 時 genres 維持空,功能不崩。
+
 ## 六、設計模式對照(練習目標)
 
 - **Repository pattern** — 聽歌統計的資料存取(Day 3)
