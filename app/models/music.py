@@ -36,6 +36,19 @@ class Track(Base):
     rank: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
 
+class RecommendedTrack(Base):
+    """已經推薦過的曲目(Day 5)。
+
+    重新產生歌單時排除這些,讓同一句 prompt 第二次能換一批
+    (照相關度往下一順位遞補)。可由 /playlists/history/reset 清空。
+    """
+
+    __tablename__ = "recommended_track"
+
+    uri: Mapped[str] = mapped_column(String, primary_key=True)  # spotify:track:...
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+
 class PlayHistory(Base):
     __tablename__ = "play_history"
     # 同一首歌在同一時間點只會有一筆 → 重複抓最近播放時自動去重

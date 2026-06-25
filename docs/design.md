@@ -120,6 +120,41 @@ LLM 可能回傳壞 JSON、夾 markdown、API 逾時或額度用完。對策:
 - `parse_context` 用 try/except 包住;**失敗時 fallback**:至少用整句當 keyword,
   讓下游(Day 5 搜尋)還能運作,不會整個崩。
 
+## 五之三、Day 5 依曲風分流組歌單(Strategy pattern)
+
+### 目標
+把 Day 4 的 `PlaylistSpec` 依曲風用**不同策略**轉成 Spotify Search 查詢,
+組成歌單,並可存回 Spotify。
+
+### Strategy pattern
+共同介面 `SearchStrategy.build_queries(spec) -> list[str]`,三個實作:
+- `JpopStrategy`:帶日本市場(`market=JP`),用 `artist:` + 關鍵字 + j-pop。
+- `ClassicalStrategy`:用「作曲家 + 曲式」搜(如 `Chopin nocturne`),
+  seed_artists 常是作曲家。
+- `DefaultStrategy`:genre + mood + 關鍵字組一般查詢。
+`select_strategy(spec)` 依 `spec.genre` 挑策略 —— 新增曲風只要加一個 class,
+不用改既有程式(這就是 Strategy 的好處)。
+
+### 分層
+- `services/playlist_strategies.py`:策略介面與實作(純邏輯,好測試)。
+- `services/playlist_service.py`:`generate_playlist`(選策略→搜尋→去重→限量)、
+  `save_playlist`(建歌單+加歌)。
+- `services/spotify_client.py`:加 `search_tracks`、`create_playlist`、`add_tracks`。
+- `routers/playlists.py`:`POST /playlists/generate`(讀)、`POST /playlists/save`(寫)。
+
+### 只用可用端點
+Search、建立歌單(`POST /users/{id}/playlists`)、加歌(`POST /playlists/{id}/tracks`)
+都仍可用;避開被禁的 Recommendations。
+注意:此 app 的 search `limit` 上限是 10,要更多用 `offset` 翻頁。
+
+### 重新產生不重複(依相關度往下遞補)
+同一句再產生時希望換一批。做法:保留相關度排序,但**排除推薦過的曲目**,
+照順位往下取(必要時 offset 翻頁取更深候選)。
+- `recommended_track` 表記錄推薦過的 URI;`RecommendationRepository` 存取。
+- `generate_playlist(..., exclude_uris=...)` 跳過這些 URI。
+- router 在 /generate 時讀歷史排除、產完記錄;`POST /playlists/history/reset` 清空重來。
+- 取捨:越往下相關度越低,池子會見底——「完全不重複」與「都很貼題」無法兼得。
+
 ## 六、設計模式對照(練習目標)
 
 - **Repository pattern** — 聽歌統計的資料存取(Day 3)

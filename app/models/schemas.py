@@ -64,3 +64,38 @@ class PlaylistSpec(BaseModel):
     era: str | None = None
     seed_artists: list[str] = []
     keywords: list[str] = []
+
+
+# --- Day 5:組歌單 ---
+class PlaylistTrack(BaseModel):
+    """一首搜尋到的歌(給前端顯示 + 存回 Spotify 用)。"""
+
+    id: str
+    name: str
+    artist: str = ""
+    album: str = ""
+    uri: str  # spotify:track:... 存歌單時用
+    spotify_url: str = ""
+    image: str | None = None
+
+
+class GenerateRequest(BaseModel):
+    text: str
+    limit: int = 20
+
+
+class GeneratePlaylistOut(BaseModel):
+    strategy: str  # 實際用了哪個策略(jpop / classical / default)
+    spec: PlaylistSpec
+    tracks: list[PlaylistTrack]
+
+
+class SaveRequest(BaseModel):
+    name: str
+    track_uris: list[str]
+    description: str = "由 music app 產生"
+
+
+class SavePlaylistOut(BaseModel):
+    playlist_url: str
+    added: int

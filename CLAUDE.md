@@ -46,6 +46,9 @@ tests/          # pytest 測試
 因此「曲風分佈」改用 **Last.fm**(`artist.getTopTags`)補曲風,key 放 `LASTFM_API_KEY`。
 別再寫依賴 Spotify artist genres / popularity 的程式。
 
+搜尋限制:這個 app 的 `/search` **limit 上限是 10**(超過回 400 "Invalid limit"),
+但 `offset` 可用 —— 要更多結果就用 offset 翻頁,別把 limit 設大於 10。
+
 ## 開發紀律(請協助維持)
 
 1. 動手前先在 `docs/` 補幾行設計。
