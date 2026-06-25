@@ -29,6 +29,7 @@ class Settings(BaseSettings):
 
     # Gemini(Day 4 開始用)
     gemini_api_key: str = ""
+    gemini_model: str = "gemini-2.5-flash"
 
     # Last.fm(Day 3:補 Spotify 拿不到的 artist 曲風)
     lastfm_api_key: str = ""

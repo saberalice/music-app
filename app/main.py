@@ -11,7 +11,7 @@ from fastapi import FastAPI
 
 from app.core.config import settings
 from app.core.database import init_db
-from app.routers import auth, health, stats
+from app.routers import auth, health, playlists, stats
 
 
 @asynccontextmanager
@@ -27,6 +27,7 @@ app = FastAPI(title=settings.app_name, lifespan=lifespan)
 app.include_router(health.router)
 app.include_router(auth.router)
 app.include_router(stats.router)
+app.include_router(playlists.router)
 
 
 @app.get("/")

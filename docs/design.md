@@ -92,6 +92,34 @@ Spotify API → service 抓資料 → repository 存進 SQLite → 統計 servic
   這一步讓同一個 `ArtistDTO` 的資料來自兩個來源(Spotify + Last.fm),正好是 Day 8
   多來源整合 / Adapter 的雛形。沒設 `LASTFM_API_KEY` 時 genres 維持空,功能不崩。
 
+## 五之二、Day 4 AI 解析情境 → 結構化 JSON
+
+### 目標
+使用者一句話(例:「下雨的午後想專心工作的爵士」)→ 用 Gemini 解析成固定格式 JSON:
+
+```json
+{ "genre": "jazz", "mood": "calm", "era": null,
+  "seed_artists": [], "keywords": ["rainy", "focus", "instrumental"] }
+```
+
+### 怎麼接
+- **httpx 直接打 Gemini REST**:`POST .../models/{model}:generateContent?key=...`
+- 用 `responseMimeType: application/json` 要求只回 JSON;prompt 也明講「只回 JSON」。
+- 模型:`gemini-2.5-flash`(可由 `GEMINI_MODEL` 調)。
+
+### 分層
+- `services/gemini_client.py`:組 prompt、打 API、抽出回應文字(純函式 `build_prompt`、
+  `extract_text`、`parse_spec` 方便測試)。
+- `services/context_service.py`:`parse_context(sentence)` 編排 + **fallback**。
+- `routers/playlists.py`:`POST /playlists/parse`(Day 4 先做解析,Day 5 再接 Strategy 組歌單)。
+- `models/schemas.py`:`PlaylistSpec`(解析結果)、`ParseRequest`。
+
+### 重點:錯誤處理與 fallback(Day 4 的核心學習)
+LLM 可能回傳壞 JSON、夾 markdown、API 逾時或額度用完。對策:
+- `parse_spec` 容錯解析(去除 ```json 圍欄、缺欄位用預設)。
+- `parse_context` 用 try/except 包住;**失敗時 fallback**:至少用整句當 keyword,
+  讓下游(Day 5 搜尋)還能運作,不會整個崩。
+
 ## 六、設計模式對照(練習目標)
 
 - **Repository pattern** — 聽歌統計的資料存取(Day 3)

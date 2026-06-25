@@ -47,3 +47,20 @@ class TopArtistOut(BaseModel):
     genres: list[str]
     rank: int | None = None
     # 註:Spotify 新 app 拿不到 popularity,故不提供
+
+
+# --- Day 4:AI 歌單 ---
+class ParseRequest(BaseModel):
+    """使用者輸入的一句話情境。"""
+
+    text: str
+
+
+class PlaylistSpec(BaseModel):
+    """Gemini 把一句話解析成的結構化歌單條件(Day 5 用來組搜尋)。"""
+
+    genre: str | None = None
+    mood: str | None = None
+    era: str | None = None
+    seed_artists: list[str] = []
+    keywords: list[str] = []
