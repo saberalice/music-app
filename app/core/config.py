@@ -37,6 +37,13 @@ class Settings(BaseSettings):
     # 資料庫(Day 3 開始用)
     database_url: str = "sqlite:///./musicapp.db"
 
+    # 前端(Day 6):OAuth 完成後導回這個網址;CORS 也允許這些來源
+    frontend_url: str = "http://127.0.0.1:5173"
+    cors_origins: list[str] = [
+        "http://127.0.0.1:5173",
+        "http://localhost:5173",
+    ]
+
 
 # 全專案共用同一個 settings 實例
 settings = Settings()

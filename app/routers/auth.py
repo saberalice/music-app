@@ -14,6 +14,7 @@ import httpx
 from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import RedirectResponse
 
+from app.core.config import settings
 from app.services.spotify_auth import SpotifyAuthService
 
 router = APIRouter(tags=["auth"])
@@ -59,7 +60,15 @@ def callback(
             status_code=502, detail=f"向 Spotify 換 token 失敗:{exc.response.text}"
         )
 
-    return {"message": "登入成功!可以打 GET /me 看你的 Spotify 個人資料了。"}
+    # 登入成功 → 導回前端(前端會自己打 /me 確認已登入)
+    return RedirectResponse(settings.frontend_url)
+
+
+@router.post("/logout")
+def logout():
+    """清除後端存的 token,登出。"""
+    service.logout()
+    return {"message": "已登出"}
 
 
 @router.get("/me")

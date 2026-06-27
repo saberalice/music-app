@@ -77,6 +77,10 @@ class SpotifyAuthService:
         self._repo.save(token)
         return token
 
+    def logout(self) -> None:
+        """清除存的 token(登出)。下次要用得重新走 /login。"""
+        self._repo.clear()
+
     # --- 第 4 步:確保拿到一個沒過期的 access token ---
     def get_valid_access_token(self) -> str | None:
         """回傳可用的 access token;沒登入過回 None,過期則自動刷新。"""

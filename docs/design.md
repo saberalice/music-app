@@ -155,6 +155,27 @@ Search、建立歌單(`POST /users/{id}/playlists`)、加歌(`POST /playlists/{i
 - router 在 /generate 時讀歷史排除、產完記錄;`POST /playlists/history/reset` 清空重來。
 - 取捨:越往下相關度越低,池子會見底——「完全不重複」與「都很貼題」無法兼得。
 
+## 五之四、Day 6 React 前端
+
+### 架構
+自用單一使用者:**token 存後端**,前端不碰 token。前端只做:
+1. 「Spotify 登入」按鈕 → 連到後端 `/login` 走 OAuth。
+2. 呼叫後端 `/stats/*`、`/sync` 拿資料,用 Recharts 畫圖。
+
+### 後端配合改動
+- 加 **CORS** 中介層,允許前端來源(`http://127.0.0.1:5173`)。
+- `/callback` 換完 token 後**導回前端**(`settings.frontend_url`),不再回 JSON。
+
+### 前端(Vite + React,JavaScript)
+放在 `frontend/`:
+- `src/api.js`:集中對後端的 fetch。
+- `App.jsx`:載入時打 `/me` 判斷有沒有登入 → 顯示登入頁或統計頁。
+- `components/StatsPage.jsx`:Top Artists 清單 + 曲風分佈長條圖(Recharts),含
+  「從 Spotify 同步」按鈕與 loading / error 狀態。
+
+### 學到的概念
+前後端分離、CORS(跨來源請求)、前端如何非同步呼叫 API 與處理載入/錯誤狀態。
+
 ## 六、設計模式對照(練習目標)
 
 - **Repository pattern** — 聽歌統計的資料存取(Day 3)
